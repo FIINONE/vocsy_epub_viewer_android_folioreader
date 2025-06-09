@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -19,6 +20,7 @@ import com.folioreader.network.R2StreamerApi;
 import com.folioreader.ui.activity.FolioActivity;
 import com.folioreader.ui.base.OnSaveHighlight;
 import com.folioreader.ui.base.SaveReceivedHighlightTask;
+import com.folioreader.ui.fragment.AddToMyWordsFragment;
 import com.folioreader.util.OnHighlightListener;
 import com.folioreader.util.ReadLocatorListener;
 
@@ -45,6 +47,15 @@ public class FolioReader {
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
     public static final String ACTION_CLOSE_FOLIOREADER = "com.folioreader.action.CLOSE_FOLIOREADER";
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
+    public static final String EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE = "com.folioreader.extra.FOLIOREADER_CLOSED_CURRENT_PAGE";
+    public static final String EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE = "com.folioreader.extra.FOLIOREADER_CLOSED_TOTAL_PAGE";
+    public static final String EXTRA_ADD_WORD = "com.folioreader.extra.ADD_WORD";
+    public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
+    public static final String EXTRA_TRANSLATE_AND_CHECK = "com.folioreader.extra.TRANSLATE_AND_CHECK";
+    public static final String ACTION_TRANSLATE_AND_CHECK = "com.folioreader.action.TRANSLATE_AND_CHECK";
+    public static final String ACTION_TEXT_TO_SPEECH = "com.folioreader.action.TEXT_TO_SPEECH";
+    public static final String EXTRA_TEXT_TO_SPEECH = "com.folioreader.extra.TEXT_TO_SPEECH";
+    public static final String ACTION_DISMISS_POPUP = "com.folioreader.action.DISMISS_POPUP";
 
     private Context context;
     private Config config;
@@ -54,6 +65,10 @@ public class FolioReader {
     private ReadLocatorListener readLocatorListener;
     private OnClosedListener onClosedListener;
     private ReadLocator readLocator;
+    private OnAddWordListener onAddWordListener;
+    private TranslateAndCheckWordListener translateAndCheckWordListener;
+    private TextToSpeechListener textToSpeechListener;
+    private OnDismissPopupListener onDismissPopupListener;
 
     @Nullable
     public Retrofit retrofit;
@@ -67,7 +82,23 @@ public class FolioReader {
          * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
          * an epub again from your application.
          */
-        void onFolioReaderClosed();
+        void onFolioReaderClosed(int currentPage, int totalPage);
+    };
+
+    public interface OnAddWordListener {
+        void onAddWordListener(String word);
+    };
+
+    public  interface TranslateAndCheckWordListener {
+        void translateAndCheckWordListener(String word);
+    };
+
+    public interface TextToSpeechListener {
+        void textToSpeechListener(String word);
+    }
+
+    public interface OnDismissPopupListener {
+        void onDismissPopupListener();
     }
 
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
@@ -96,10 +127,54 @@ public class FolioReader {
     private BroadcastReceiver closedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (onClosedListener != null)
-                onClosedListener.onFolioReaderClosed();
+            if (onClosedListener != null) {
+                int currentPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE);
+                int totalPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE);
+                onClosedListener.onFolioReaderClosed(currentPage, totalPage);
+            }
         }
     };
+
+    private BroadcastReceiver addWordReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (onAddWordListener != null) {
+                String word = intent.getExtras().getString(EXTRA_ADD_WORD);
+                onAddWordListener.onAddWordListener(word);
+            }
+        }
+    };
+
+    private BroadcastReceiver translateAndCheckReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (translateAndCheckWordListener != null) {
+                String word = intent.getExtras().getString(EXTRA_TRANSLATE_AND_CHECK);
+                translateAndCheckWordListener.translateAndCheckWordListener(word);
+            }
+        }
+    };
+
+    private BroadcastReceiver textToSpeechReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (textToSpeechListener != null) {
+                String word = intent.getExtras().getString(EXTRA_TEXT_TO_SPEECH);
+                textToSpeechListener.textToSpeechListener(word);
+            }
+        }
+    };
+
+    private BroadcastReceiver onDismissPopupReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (onDismissPopupListener != null) {
+                onDismissPopupListener.onDismissPopupListener();
+            }
+        }
+    };
+
+
 
     public static FolioReader get() {
 
@@ -130,6 +205,14 @@ public class FolioReader {
                 new IntentFilter(ACTION_SAVE_READ_LOCATOR));
         localBroadcastManager.registerReceiver(closedReceiver,
                 new IntentFilter(ACTION_FOLIOREADER_CLOSED));
+        localBroadcastManager.registerReceiver(addWordReceiver,
+                new IntentFilter(ACTION_ADD_WORD));
+        localBroadcastManager.registerReceiver(translateAndCheckReceiver,
+                new IntentFilter(ACTION_TRANSLATE_AND_CHECK));
+        localBroadcastManager.registerReceiver(textToSpeechReceiver,
+                new IntentFilter(ACTION_TEXT_TO_SPEECH));
+        localBroadcastManager.registerReceiver(onDismissPopupReceiver,
+                new IntentFilter(ACTION_DISMISS_POPUP));
     }
 
     public FolioReader openBook(String assetOrSdcardPath) {
@@ -193,6 +276,7 @@ public class FolioReader {
      *                       saved one while execution.
      */
     public FolioReader setConfig(Config config, boolean overrideConfig) {
+        Log.v("FolioReader", "-> setConfig -> lastCommit: portrait orientation");
         this.config = config;
         this.overrideConfig = overrideConfig;
         return singleton;
@@ -245,15 +329,42 @@ public class FolioReader {
         return singleton;
     }
 
+    public FolioReader setOnAddWordListener(OnAddWordListener onAddWordListener) {
+        this.onAddWordListener = onAddWordListener;
+        return singleton;
+    }
+
+    public FolioReader setTranslateAndCheckListener(TranslateAndCheckWordListener translateAndCheckWordListener) {
+        this.translateAndCheckWordListener = translateAndCheckWordListener;
+        return singleton;
+    }
+
+    public FolioReader setTextToSpeechListener(TextToSpeechListener textToSpeechListener) {
+        this.textToSpeechListener = textToSpeechListener;
+        return singleton;
+    }
+
+    public FolioReader setOnDismissPopupListener(OnDismissPopupListener onDismissPopupListener) {
+        this.onDismissPopupListener = onDismissPopupListener;
+        return singleton;
+    }
+
     public void saveReceivedHighLights(List<HighLight> highlights,
                                        OnSaveHighlight onSaveHighlight) {
         new SaveReceivedHighlightTask(onSaveHighlight, highlights).execute();
     }
 
+    public void sendTranslateAndCheckWord (String translatedWord, boolean wordExist) {
+        Intent intent = new Intent(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK);
+        intent.putExtra(AddToMyWordsFragment.EXTRA_TRANSLATE, translatedWord);
+        intent.putExtra(AddToMyWordsFragment.EXTRA_CHECK, wordExist);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     /**
      * Closes all the activities related to FolioReader.
      * After closing all the activities of FolioReader, callback can be received in
-     * {@link OnClosedListener#onFolioReaderClosed()} if implemented.
+     * {@link OnClosedListener#onFolioReaderClosed(int currentPage, int totalPage)} if implemented.
      * Developer is still bound to call {@link #clear()} or {@link #stop()}
      * for clean up if required.
      */
@@ -275,6 +386,10 @@ public class FolioReader {
             singleton.onHighlightListener = null;
             singleton.readLocatorListener = null;
             singleton.onClosedListener = null;
+            singleton.onAddWordListener = null;
+            singleton.translateAndCheckWordListener = null;
+            singleton.textToSpeechListener = null;
+            singleton.onDismissPopupListener = null;
         }
     }
 
@@ -297,5 +412,9 @@ public class FolioReader {
         localBroadcastManager.unregisterReceiver(highlightReceiver);
         localBroadcastManager.unregisterReceiver(readLocatorReceiver);
         localBroadcastManager.unregisterReceiver(closedReceiver);
+        localBroadcastManager.unregisterReceiver(addWordReceiver);
+        localBroadcastManager.unregisterReceiver(translateAndCheckReceiver);
+        localBroadcastManager.unregisterReceiver(textToSpeechReceiver);
+        localBroadcastManager.unregisterReceiver(onDismissPopupReceiver);
     }
 }

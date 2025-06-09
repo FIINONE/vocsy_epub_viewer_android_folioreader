@@ -29,4 +29,9 @@
     <color name="highlight_blue">#ADD8FF</color>
     <color name="highlight_pink">#FFB0CA</color>
 
+    <color name="primary_dark">#FFC700</color>
+    <color name="sky_Lighter">#F2F4F5</color>>
+    <color name="ink_base">#404446</color>
+    <color name="sky_base">#CDCFD0</color>
+
 </resources>

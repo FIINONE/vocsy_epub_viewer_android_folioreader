@@ -1022,7 +1022,10 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         if (r2StreamerServer != null) r2StreamerServer!!.stop()
 
         if (isFinishing) {
-            localBroadcastManager.sendBroadcast(Intent(FolioReader.ACTION_FOLIOREADER_CLOSED))
+            val intent = Intent(FolioReader.ACTION_FOLIOREADER_CLOSED)
+            intent.putExtra(FolioReader.EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE, currentChapterIndex)
+            intent.putExtra(FolioReader.EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE, spine?.size ?: 0)
+            localBroadcastManager.sendBroadcast(intent)
             FolioReader.get().retrofit = null
             FolioReader.get().r2StreamerApi = null
         }

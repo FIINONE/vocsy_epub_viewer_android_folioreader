@@ -69,5 +69,6 @@
         <item quantity="one">%d výskyt</item>
         <item quantity="other">%d výskytů</item>
     </plurals>
+    <string name="addWord">Add to my Words</string>
 
 </resources>

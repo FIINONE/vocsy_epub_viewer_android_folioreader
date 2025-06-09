@@ -87,7 +87,7 @@
     </style>
 
     <style name="TextViewTextSelector" parent="@android:style/Widget.TextView">
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">8dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?defaultFontColor</item>
         <item name="android:textStyle">bold</item>
@@ -97,9 +97,10 @@
     </style>
 
     <style name="ImageViewTextSelectorMarker">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:layout_width">37dp</item>
+        <item name="android:layout_height">37dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">5dp</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
         <item name="android:background">?selectableItemBackground</item>
@@ -128,6 +129,22 @@
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/black</item>
+    </style>
+    
+    <style name="InterSelectedStyle">
+        <item name="fontWeight">500</item>
+        <item name="android:layout_height">21dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">?attr/textColor</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="InterTranslatedStyle">
+        <item name="fontWeight">400</item>
+        <item name="android:layout_height">18dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">?attr/subTextColor</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>

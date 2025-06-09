@@ -56,6 +56,8 @@
         <item name="underlineIconFillColorTop">@color/night_underline_icon_fill_color_top</item>
 
         <item name="scrollBarColor">@color/night_scroll_bar_color</item>
+        <item name="textColor">@color/sky_Lighter</item>
+        <item name="subTextColor">@color/sky_base</item>
 
     </style>
 

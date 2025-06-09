@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="4dp" />
+    <padding
+        android:top="2dp"
+        android:left="2dp"
+        android:bottom="2dp"
+        android:right="2dp" />
+</shape>
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >-->
+<!--    <item >-->
+<!--        <rotate-->
+<!--            android:fromDegrees="45"-->
+<!--            android:toDegrees="45"-->
+<!--            android:pivotX="-40%"-->
+<!--            android:pivotY="87%" >-->
+<!--            <shape-->
+<!--                android:shape="rectangle"  >-->
+<!--                <stroke android:color="@android:color/transparent" android:width="10dp"/>-->
+<!--                <solid-->
+<!--                    android:color="#FFFFFF"  />-->
+<!--            </shape>-->
+<!--        </rotate>-->
+<!--    </item>-->
+<!--</layer-list>-->
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:width="288dp"-->
+<!--    android:height="100dp"-->
+<!--    android:viewportHeight="100"-->
+<!--    android:viewportWidth="288">-->
+
+<!--    <path-->
+<!--        android:fillColor="@color/white"-->
+<!--        android:pathData="M0 0 L50 0 L50 50 L30 50 L25 60 L20 50 L0 50 Z"-->
+<!--        android:strokeColor="#9a1616" />-->
+
+<!--</vector>-->
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:tools="http://schemas.android.com/tools" >-->
+
+<!--    <item-->
+<!--        android:bottom="50dp"-->
+<!--        tools:width="25dp"-->
+<!--        tools:height="30dp">-->
+<!--        <shape android:shape="rectangle">-->
+<!--            <solid android:color="@color/primary_dark"/>-->
+<!--            <corners-->
+<!--                android:topLeftRadius="10dp"-->
+<!--                android:topRightRadius="10dp"-->
+<!--                android:bottomRightRadius="0dp"-->
+<!--                android:bottomLeftRadius="10dp"/>-->
+<!--        </shape>-->
+<!--    </item>-->
+
+<!--    <item-->
+<!--        android:width="100dp"-->
+<!--        android:height="200dp"-->
+<!--        android:gravity="bottom|right">-->
+<!--        <vector xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--            android:width="200dp"-->
+<!--            android:height="200dp"-->
+<!--            android:viewportWidth="25.0"-->
+<!--            android:viewportHeight="25.0">-->
+<!--            <path-->
+<!--                android:pathData="M25,25 25,0 0,0z"-->
+<!--                android:fillColor="@color/primary_dark"/>-->
+<!--        </vector>-->
+<!--    </item>-->
+
+<!--</layer-list>-->

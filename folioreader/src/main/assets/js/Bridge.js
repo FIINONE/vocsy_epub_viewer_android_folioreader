@@ -800,6 +800,17 @@ function deleteThisHighlight() {
         FolioWebView.deleteThisHighlight(thisHighlight.id);
 }
 
+function getSelectionText() {
+    var selectionType = window.getSelection().type;
+    var selectedText = "";
+    if (selectionType == "Range") {
+        selectedText = window.getSelection().toString();
+    } else {
+        selectedText = thisHighlight.textContent;
+    }
+    return selectedText;
+}
+
 function onTextSelectionItemClicked(id) {
     var selectionType = window.getSelection().type;
     var selectedText = "";
