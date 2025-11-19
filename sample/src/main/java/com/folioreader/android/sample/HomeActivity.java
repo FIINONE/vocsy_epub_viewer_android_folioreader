@@ -119,38 +119,39 @@ public class HomeActivity extends AppCompatActivity
 
         String jsonString = "{\"bookId\":\"urn:isbn:9781449328030\",\"href\":\"/EPUB/ch02.xhtml\",\"created\":1680065091630,\"locations\":{\"cfi\":\"epubcfi(/0!/4/2[building_a_better_epub]/10/28/10/5:0)\"},\"title\":\"\"}";
 //                loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
-        return ReadLocator.fromJson(jsonString);
+        return ReadLocator.Companion.fromJson(jsonString);
     }
 
     @Override
     public void saveReadLocator(ReadLocator readLocator) {
-        Log.i(LOG_TAG, "-> saveReadLocator -> " + readLocator.toJson());
+//        Log.i(LOG_TAG, "-> saveReadLocator -> " + readLocator.toJson());
     }
 
     /*
      * For testing purpose, we are getting dummy highlights from asset. But you can get highlights from your server
      * On success, you can save highlights to FolioReader DB.
      */
+
     private void getHighlightsAndSave() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ArrayList<HighLight> highlightList = null;
+                List<HighLight> highlightList = null;
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
                     highlightList = objectMapper.readValue(
                             loadAssetTextAsString("highlights/highlights_data.json"),
-                            new TypeReference<List<HighlightData>>() {
-                            });
+                            new TypeReference<List<HighLight>>() {}
+                    );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                if (highlightList == null) {
+                if (highlightList != null) {
                     folioReader.saveReceivedHighLights(highlightList, new OnSaveHighlight() {
                         @Override
                         public void onFinished() {
-                            //You can do anything on successful saving highlight list
+                            // Do something on success
                         }
                     });
                 }
@@ -210,7 +211,7 @@ public class HomeActivity extends AppCompatActivity
 
         mapd.put("currentPage", currentPage);
         mapd.put("totalPage", totalPage);
-        mapd.put("readLocator", readLocator.toJson());
+//        mapd.put("readLocator", readLocator.toJson());
         Log.v(LOG_TAG, "-> onFolioReaderClosed" + mapd);
     }
 
