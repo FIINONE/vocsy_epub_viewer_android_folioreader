@@ -13,13 +13,9 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.folioreader.FolioReader
 import com.folioreader.R
-import kotlinx.android.synthetic.main.folio_page_fragment.view.*
-import kotlinx.android.synthetic.main.layout_add_to_my_words.*
-import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
-import java.util.*
 
 
-class AddToMyWordsFragment(word: String, addToWardView: View) {
+class AddToMyWordsFragment(word: String, addToWordView: View) {
     private val TAG = "AddToMyWordsFragment"
 
     private lateinit var myDialog: Dialog
@@ -28,13 +24,13 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
     private var translatedWord: String = ""
     private var wordExists: Boolean = false
 
-    private lateinit var addToWordsView: View
+    // ROOT VIEW INJECTED FROM OUTSIDE
+    private val addToWordsView: View = addToWordView
+
+    // VIEWS THAT WERE PREVIOUSLY SYNTHETIC
     private lateinit var wordTextView: TextView
     private lateinit var translatedWordTextView: TextView
     private lateinit var addWordButton: Button
-
-
-//    private var tts: TextToSpeech? = null
     private lateinit var speechButton: ImageButton
 
     companion object {
@@ -51,13 +47,14 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
             if (extras != null) {
                 translatedWord = extras.getString(EXTRA_TRANSLATE, "")
                 wordExists = extras.getBoolean(EXTRA_CHECK, false)
-                addToWordsView.addWordButton.isEnabled = !wordExists
 
                 Log.d(TAG, "-> translateAndCheckReceiver -> translatedWord -> $translatedWord")
                 Log.d(TAG, "-> translateAndCheckReceiver -> wordExists -> $wordExists")
                 Log.d(TAG, "-> isEnabled -> ${!wordExists}")
 
+                addWordButton.isEnabled = !wordExists
                 translatedWordTextView.text = translatedWord
+
                 addWordButton.text =  if (wordExists) "Word added" else "Add to Pocket"
                 addWordButton.setBackgroundResource(if (wordExists) R.drawable.inter_grey_button else R.drawable.inter_primary_button)
             }
@@ -67,7 +64,6 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
     init {
         Log.d(TAG, "-> init -> ")
 
-        addToWordsView = addToWardView
         bindViews(addToWordsView)
 
         selectedWord = word.substring(1, word.length-1)
@@ -106,6 +102,15 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
         Log.v(TAG, "-> wordExist -> $showAddWord")
 
         return showAddWord
+    }
+
+    private fun bindViews(view: View) {
+        Log.d(TAG, "-> bindViews -> ")
+
+        wordTextView = view.findViewById(R.id.selectedWord)
+        translatedWordTextView = view.findViewById(R.id.translatedWord)
+        addWordButton = view.findViewById(R.id.addWordButton)
+        speechButton = view.findViewById(R.id.speechButton)
     }
 
 //    override fun onInit(status: Int) {
@@ -224,14 +229,6 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
 
             localBroadcastManager.sendBroadcast(intent)
         }
-    }
-
-    private fun bindViews(view: View) {
-        Log.d(TAG, "-> bindViews -> ")
-        wordTextView = addToWordsView.selectedWord
-        translatedWordTextView = addToWordsView.translatedWord
-        addWordButton = addToWordsView.addWordButton
-        speechButton = addToWordsView.speechButton
     }
 
 //    override fun onDestroy() {

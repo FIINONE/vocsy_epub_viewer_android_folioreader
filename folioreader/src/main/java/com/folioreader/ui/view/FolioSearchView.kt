@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.widget.SearchView
@@ -23,21 +24,18 @@ class FolioSearchView : SearchView {
         val LOG_TAG: String = FolioSearchView::class.java.simpleName
     }
 
-    private lateinit var searchAutoComplete: SearchView.SearchAutoComplete
+    private lateinit var searchAutoComplete: AutoCompleteTextView
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
+    // ✔ FIXED – correct constructors, non-null Context only
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
+            : super(context, attrs, defStyleAttr)
 
     fun init(componentName: ComponentName, config: Config) {
         Log.v(LOG_TAG, "-> init")
 
-        val searchManager: SearchManager =
-            context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         setSearchableInfo(searchManager.getSearchableInfo(componentName))
         setIconifiedByDefault(false)
 
@@ -48,7 +46,7 @@ class FolioSearchView : SearchView {
     private fun adjustLayout() {
         Log.v(LOG_TAG, "-> adjustLayout")
 
-        // Hide searchHintIcon
+        // Hide search hint icon
         val searchMagIcon: View = findViewById(R.id.search_mag_icon)
         searchMagIcon.layoutParams = LinearLayout.LayoutParams(0, 0)
 
@@ -64,29 +62,24 @@ class FolioSearchView : SearchView {
         UiUtil.setColorIntToDrawable(config.currentThemeColor, searchCloseButton.drawable)
 
         searchAutoComplete = findViewById(R.id.search_src_text)
+
         UiUtil.setEditTextCursorColor(searchAutoComplete, config.currentThemeColor)
         UiUtil.setEditTextHandleColor(searchAutoComplete, config.currentThemeColor)
+
         searchAutoComplete.highlightColor =
             ColorUtils.setAlphaComponent(config.currentThemeColor, 85)
+
+        // Theme behavior
         if (config.isNightMode) {
             searchAutoComplete.setTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.night_title_text_color
-                )
+                ContextCompat.getColor(context, R.color.night_title_text_color)
             )
             searchAutoComplete.setHintTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.night_text_color
-                )
+                ContextCompat.getColor(context, R.color.night_text_color)
             )
         } else {
             searchAutoComplete.setHintTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.edit_text_hint_color
-                )
+                ContextCompat.getColor(context, R.color.edit_text_hint_color)
             )
         }
     }

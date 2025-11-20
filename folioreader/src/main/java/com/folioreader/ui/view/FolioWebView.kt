@@ -25,6 +25,7 @@ import androidx.core.view.GestureDetectorCompat
 import com.folioreader.Config
 import com.folioreader.Constants
 import com.folioreader.R
+import com.folioreader.databinding.ViewConfigBinding
 import com.folioreader.model.DisplayUnit
 import com.folioreader.model.HighLight
 import com.folioreader.model.HighlightImpl.HighlightStyle
@@ -38,7 +39,7 @@ import com.folioreader.util.AppUtil
 import com.folioreader.util.HighlightUtil
 import com.folioreader.util.UiUtil
 import dalvik.system.PathClassLoader
-import kotlinx.android.synthetic.main.text_selection.view.*
+//import kotlinx.android.synthetic.main.text_selection.view.*
 import org.json.JSONObject
 import org.springframework.util.ReflectionUtils
 import java.lang.ref.WeakReference
@@ -167,7 +168,7 @@ class FolioWebView : WebView {
     private inner class HorizontalGestureListener : GestureDetector.SimpleOnGestureListener() {
 
         override fun onScroll(
-            e1: MotionEvent,
+            e1: MotionEvent?,
             e2: MotionEvent,
             distanceX: Float,
             distanceY: Float
@@ -178,7 +179,7 @@ class FolioWebView : WebView {
         }
 
         override fun onFling(
-            e1: MotionEvent,
+            e1: MotionEvent?,
             e2: MotionEvent,
             velocityX: Float,
             velocityY: Float
@@ -236,7 +237,7 @@ class FolioWebView : WebView {
     private inner class VerticalGestureListener : GestureDetector.SimpleOnGestureListener() {
 
         override fun onScroll(
-            e1: MotionEvent,
+            e1: MotionEvent?,
             e2: MotionEvent,
             distanceX: Float,
             distanceY: Float
@@ -252,7 +253,7 @@ class FolioWebView : WebView {
         }
 
         override fun onFling(
-            e1: MotionEvent,
+            e1: MotionEvent?,
             e2: MotionEvent,
             velocityX: Float,
             velocityY: Float
@@ -306,43 +307,54 @@ class FolioWebView : WebView {
         viewTextSelection = LayoutInflater.from(ctw).inflate(R.layout.text_selection, null)
         viewTextSelection.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
 
-        viewTextSelection.yellowHighlight.setOnClickListener {
+        // --- REPLACE SYNTHETICS WITH findViewById ---
+        val yellowHighlight = viewTextSelection.findViewById<View>(R.id.yellowHighlight)
+        val greenHighlight = viewTextSelection.findViewById<View>(R.id.greenHighlight)
+        val blueHighlight = viewTextSelection.findViewById<View>(R.id.blueHighlight)
+        val pinkHighlight = viewTextSelection.findViewById<View>(R.id.pinkHighlight)
+        val underlineHighlight = viewTextSelection.findViewById<View>(R.id.underlineHighlight)
+        val deleteHighlight = viewTextSelection.findViewById<View>(R.id.deleteHighlight)
+        val copySelection = viewTextSelection.findViewById<View>(R.id.copySelection)
+        val shareSelection = viewTextSelection.findViewById<View>(R.id.shareSelection)
+        val defineSelection = viewTextSelection.findViewById<View>(R.id.defineSelection)
+
+        yellowHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> yellowHighlight")
             onHighlightColorItemsClicked(HighlightStyle.Yellow, false)
         }
-        viewTextSelection.greenHighlight.setOnClickListener {
+        greenHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> greenHighlight")
             onHighlightColorItemsClicked(HighlightStyle.Green, false)
         }
-        viewTextSelection.blueHighlight.setOnClickListener {
+        blueHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> blueHighlight")
             onHighlightColorItemsClicked(HighlightStyle.Blue, false)
         }
-        viewTextSelection.pinkHighlight.setOnClickListener {
+        pinkHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> pinkHighlight")
             onHighlightColorItemsClicked(HighlightStyle.Pink, false)
         }
-        viewTextSelection.underlineHighlight.setOnClickListener {
+        underlineHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> underlineHighlight")
             onHighlightColorItemsClicked(HighlightStyle.Underline, false)
         }
 
-        viewTextSelection.deleteHighlight.setOnClickListener {
+        deleteHighlight.setOnClickListener {
             Log.v(LOG_TAG, "-> onClick -> deleteHighlight")
             dismissPopupWindow()
             loadUrl("javascript:clearSelection()")
             loadUrl("javascript:deleteThisHighlight()")
         }
 
-        viewTextSelection.copySelection.setOnClickListener {
+        copySelection.setOnClickListener {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
-        viewTextSelection.shareSelection.setOnClickListener {
+        shareSelection.setOnClickListener {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
-        viewTextSelection.defineSelection.setOnClickListener {
+        defineSelection.setOnClickListener {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
@@ -379,7 +391,7 @@ class FolioWebView : WebView {
         bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
         dictionaryFragment.arguments = bundle
         dictionaryFragment.show(
-            parentFragment.fragmentManager!!,
+            parentFragment.requireFragmentManager(),
             DictionaryFragment::class.java.name
         )
     }
@@ -855,8 +867,10 @@ class FolioWebView : WebView {
                     Log.i(LOG_TAG, "-> Stopped scrolling, show Popup")
                     popupWindow.dismiss()
 
+                    val addToMyWordsInclude = viewTextSelection.findViewById<View>(R.id.addToMyWordsInclude)
+
                     evaluateJavascript("javascript:getSelectionText()") { selectedText ->
-                        addToMyWordsFragment = AddToMyWordsFragment(selectedText, viewTextSelection.addToMyWordsInclude)
+                        addToMyWordsFragment = AddToMyWordsFragment(selectedText, addToMyWordsInclude)
                     }
                     popupWindow = PopupWindow(viewTextSelection, WRAP_CONTENT, WRAP_CONTENT)
                     popupWindow.isClippingEnabled = false

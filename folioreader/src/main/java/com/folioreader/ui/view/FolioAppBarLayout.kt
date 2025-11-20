@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Log
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.AppBarLayout
 
 class FolioAppBarLayout : AppBarLayout {
@@ -17,52 +19,51 @@ class FolioAppBarLayout : AppBarLayout {
     var navigationBarHeight: Int = 0
     var insets: Rect? = null
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(context: Context) : super(context)
 
-        ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, windowInsets ->
+
             Log.v(LOG_TAG, "-> onApplyWindowInsets")
-            // For API level 20 and above
 
-            this.insets = Rect(
-                insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
-                insets.systemWindowInsetRight, insets.systemWindowInsetBottom
-            )
+            val sysBars: Insets =
+                windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            navigationBarHeight = insets.systemWindowInsetBottom
+            this.insets = Rect(sysBars.left, sysBars.top, sysBars.right, sysBars.bottom)
 
-            setMargins(
-                insets.systemWindowInsetLeft, insets.systemWindowInsetTop,
-                insets.systemWindowInsetRight
-            )
-            insets
+            navigationBarHeight = sysBars.bottom
+
+            setMargins(sysBars.left, sysBars.top, sysBars.right)
+
+            windowInsets
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun fitSystemWindows(insets: Rect?): Boolean {
         Log.v(LOG_TAG, "-> fitSystemWindows")
-        // For API level 19 and below
 
-        this.insets = Rect(insets)
+        if (insets != null) {
+            this.insets = Rect(insets)
+            navigationBarHeight = insets.bottom
+            setMargins(insets.left, insets.top, insets.right)
+        }
 
-        navigationBarHeight = insets!!.bottom
-
-        setMargins(insets.left, insets.top, insets.right)
         return super.fitSystemWindows(insets)
     }
 
     private fun setMargins(left: Int, top: Int, right: Int) {
-
-        val marginLayoutParams = layoutParams as MarginLayoutParams
-        marginLayoutParams.leftMargin = left
-        marginLayoutParams.topMargin = top
-        marginLayoutParams.rightMargin = right
-        layoutParams = marginLayoutParams
+        val params = layoutParams as MarginLayoutParams
+        params.leftMargin = left
+        params.topMargin = top
+        params.rightMargin = right
+        layoutParams = params
     }
 
     fun setTopMargin(top: Int) {
-        val marginLayoutParams = layoutParams as MarginLayoutParams
-        marginLayoutParams.topMargin = top
-        layoutParams = marginLayoutParams
+        val params = layoutParams as MarginLayoutParams
+        params.topMargin = top
+        layoutParams = params
     }
 }
