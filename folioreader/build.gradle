@@ -88,8 +88,6 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
 
-    implementation "org.readium.r2:shared:2.0.0"
-
     implementation "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
     implementation "com.fasterxml.jackson.core:jackson-annotations:$versions.jackson"
     implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
