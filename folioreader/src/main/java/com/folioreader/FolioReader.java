@@ -11,6 +11,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.folioreader.model.HighLight;
 import com.folioreader.model.HighlightImpl;
 import com.folioreader.model.locators.ReadLocator;
@@ -82,7 +84,7 @@ public class FolioReader {
          * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
          * an epub again from your application.
          */
-        void onFolioReaderClosed(int currentPage, int totalPage);
+        void onFolioReaderClosed(int currentPage, int totalPage, String locator);
     };
 
     public interface OnAddWordListener {
@@ -130,10 +132,22 @@ public class FolioReader {
             if (onClosedListener != null) {
                 int currentPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE);
                 int totalPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE);
-                onClosedListener.onFolioReaderClosed(currentPage, totalPage);
+                String locator = readLocatorToJson(readLocator);
+                onClosedListener.onFolioReaderClosed(currentPage, totalPage, locator);
             }
         }
     };
+
+    public String readLocatorToJson(Object object) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            Log.e("FolioReader", "-> ", e);
+            return "";
+        }
+    }
 
     private BroadcastReceiver addWordReceiver = new BroadcastReceiver() {
         @Override
@@ -364,7 +378,7 @@ public class FolioReader {
     /**
      * Closes all the activities related to FolioReader.
      * After closing all the activities of FolioReader, callback can be received in
-     * {@link OnClosedListener#onFolioReaderClosed(int currentPage, int totalPage)} if implemented.
+     * {@link OnClosedListener#onFolioReaderClosed(int currentPage, int totalPage, String lcoator)} if implemented.
      * Developer is still bound to call {@link #clear()} or {@link #stop()}
      * for clean up if required.
      */

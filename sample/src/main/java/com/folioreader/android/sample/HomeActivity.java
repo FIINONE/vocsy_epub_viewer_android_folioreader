@@ -40,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,14 +203,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFolioReaderClosed(int currentPage, int totalPage) {
+    public void onFolioReaderClosed(int currentPage, int totalPage, String locator) {
         Log.v(LOG_TAG, "-> onFolioReaderClosed" + currentPage + totalPage);
         final Map<String, Object> mapd = new HashMap<String, Object>();
-        ReadLocator readLocator = getLastReadLocator();
 
         mapd.put("currentPage", currentPage);
         mapd.put("totalPage", totalPage);
-//        mapd.put("readLocator", readLocator.toJson());
+        mapd.put("readLocator", locator);
         Log.v(LOG_TAG, "-> onFolioReaderClosed" + mapd);
     }
 
